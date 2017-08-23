@@ -14,7 +14,7 @@ public class Maps {
     private int[][] adjacenciesMatrix;
     private Random weight;
     private Random coord;
-    private static final int[] LIMITEEDGE = {1,10};
+    private static final int[] LIMITEEDGE = {1,199};
     private static final int LIMITEWEIGHT = 10;
     private int size;
     
@@ -48,7 +48,7 @@ public class Maps {
         int[] point = new int[QUANTMAXEADGE];
         int p = LIMCONECTION+weight.nextInt(LIMCONECTION);
         for(int i=0;i < p ;i++){
-            point[i] = (linha)+coord.nextInt(this.LIMITEEDGE[1]-linha);
+            point[i] = linha+coord.nextInt(this.LIMITEEDGE[1]-linha);
         }
         return point;
     }
@@ -61,15 +61,39 @@ public class Maps {
             }
         }
     }
-    public void dijkstra(int u, int v){
+    public int[] dijkstra(int u, int v){
         int w = u;
+        int infinito = 999999999;
         int[] gama = new int[this.size];
-        int[] beta = setbeta(this.size);
+        int[] beta = setBeta(this.size);
         int[] pi = new int[this.size];
         gama[u] = 1;
         beta[u] = 0;
+        while(w != v){
+            int menorBeta = infinito;
+            int r_asteristico = -1;
+            ArrayList<Integer> edgesW_R = this.edges(w);
+            for(Integer r: edgesW_R){
+                int alphaW_R = this.alpha(w, r);
+                if(gama[r] == 0 && beta[r] > beta[w]+alphaW_R){
+                    beta[r] = beta[w] + alphaW_R;
+                    pi[r] = w;
+                }
+            }
+            for(int j=0;j < beta.length;j++){
+                if(beta[j] != infinito && gama[j] == 0 && beta[j] <= menorBeta){
+                    menorBeta = beta[j];
+                    r_asteristico = j;
+                }
+            }
+            if(r_asteristico == -1)
+                break;
+            gama[r_asteristico] = 1;
+            w = r_asteristico;
+        }
+        return pi;
     }
-    public int[] setbeta(int tamanho){
+    public int[] setBeta(int tamanho){
         int[] gama = new int[tamanho];
         int infinito = 999999999;
         for(int i=0; i < tamanho;i++){
@@ -77,7 +101,10 @@ public class Maps {
         }
         return gama;
     }
-    public Object edges(int vertice){
+    public int alpha(int w, int r){
+        return this.adjacenciesMatrix[w][r];
+    }
+    public ArrayList<Integer> edges(int vertice){
         ArrayList<Integer> eadge = new ArrayList<Integer>();
         for(int i=0;i < this.size;i++){
             if (this.adjacenciesMatrix[vertice][i] != 0)
@@ -87,8 +114,22 @@ public class Maps {
         }
         return eadge;
     }
+    public void setAdjacenciesMatriz(int[][] mat){
+        this.adjacenciesMatrix = mat;
+    }
     public static void main(String[] args) {
-        Maps mps = new Maps(10);
+        int[][] matriz = {{0,1,1,0,0},
+                          {0,0,1,0,1},
+                          {0,0,0,1,1},
+                          {0,0,0,0,1},
+                          {0,0,0,0,0}};
+        ArrayList<Integer> ar = new ArrayList<Integer>();
+        Maps mps = new Maps(199);
+        //mps.setAdjacenciesMatriz(matriz);
+        ar = mps.edges(3);
+        for(Integer d: ar){
+            System.err.println(d);
+        }
         mps.imprime();
         }
 }
