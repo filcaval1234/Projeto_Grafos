@@ -93,6 +93,14 @@ public class Maps {
         }
         return pi;
     }
+    public int filterDijkstra(int[] pi,int u, int v, 
+            ArrayList<Integer> smallerPath){
+        if(u != v){
+            smallerPath.add(v);
+            return this.filterDijkstra(pi, u, pi[v], smallerPath);
+        }
+        return 0;
+    }
     public int[] setBeta(int tamanho){
         int[] gama = new int[tamanho];
         int infinito = 999999999;
