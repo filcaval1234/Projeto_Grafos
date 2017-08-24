@@ -11,10 +11,10 @@ import java.util.Random;
  * @author fc.corporation
  */
 public class Maps {
-    static int[][] adjacenciesMatrix = {{0,0,1,1,0},
-                                        {0,0,1,0,1},
-                                        {0,0,0,1,0},
-                                        {0,0,0,0,1},
+    static int[][] adjacenciesMatrix = {{0,0,5,9,0},
+                                        {0,0,3,0,10},
+                                        {0,0,0,9,0},
+                                        {0,0,0,0,100},
                                         {0,0,0,0,0}};
     private Random weight;
     private Random coord;
@@ -69,7 +69,9 @@ public class Maps {
             }
         }
     }
-    public int[] dijkstra(int u, int v){
+    public ArrayList<Integer> dijkstra(int u, int v){
+    //public int[] dijkstra(int u, int v){
+        ArrayList<Integer> piFiltrade = new ArrayList<Integer>();
         int w = u;
         int infinito = 999999999;
         int[] gama = new int[this.size];
@@ -100,7 +102,10 @@ public class Maps {
             gama[r_asteristico] = 1;
             w = r_asteristico;
         }
-        return pi;
+        this.filterDijkstra(pi, u, v, piFiltrade);
+        piFiltrade.add(u);
+        return piFiltrade;
+        //return pi;
     }
     public int filterDijkstra(int[] pi,int u, int v, 
             ArrayList<Integer> smallerPath){
@@ -143,7 +148,8 @@ public class Maps {
         ArrayList<Integer> ar = new ArrayList<Integer>();
         Maps mps = new Maps(10);
         //mps.imprime();
-        int[] pi = mps.dijkstra(0, 4);
+        ArrayList<Integer> pi = mps.dijkstra(0, 4);
+        //int[] pi = mps.dijkstra(0, 4);
         for(int i: pi){
             System.err.println(i);
         }
