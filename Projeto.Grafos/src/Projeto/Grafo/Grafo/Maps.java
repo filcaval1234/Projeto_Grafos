@@ -11,19 +11,23 @@ import java.util.Random;
  * @author fc.corporation
  */
 public class Maps {
-    private int[][] adjacenciesMatrix;
+    static int[][] adjacenciesMatrix = {{0,0,1,1,0},
+                                        {0,0,1,0,1},
+                                        {0,0,0,1,0},
+                                        {0,0,0,0,1},
+                                        {0,0,0,0,0}};
     private Random weight;
     private Random coord;
-    private static final int[] LIMITEEDGE = {1,199};
-    private static final int LIMITEWEIGHT = 10;
+    private static final int[] LIMITEEDGE = {1,10};
+    private static final int LIMITEWEIGHT = 9;
     private int size;
     
     public Maps(int tamanho){
-        adjacenciesMatrix = new int[tamanho][tamanho];
+        //this.adjacenciesMatrix = new int[tamanho][tamanho];
         this.weight = new Random();
         this.coord = new Random();
-        this.size = tamanho;
-        this.setAdjacencieMatrix();
+        this.size = Maps.adjacenciesMatrix.length;
+        //this.setAdjacencieMatrix();
     }
     private void setAdjacencieMatrix(){
         for(int i=0;i < this.adjacenciesMatrix.length;i++){
@@ -32,13 +36,17 @@ public class Maps {
             while(j < edges.length){
                 if(edges[j] == 0)
                     break;
-                if(i == j){
-                    j++;
+                if(i == edges[j]){
+                    ++edges[j];
                     continue;
                 }
-                this.adjacenciesMatrix[i][edges[j]] = 1+this.weight.nextInt(
-                        this.LIMITEWEIGHT);
-                j++;
+                try{
+                    this.adjacenciesMatrix[i][edges[j]] = 1+this.weight.nextInt(
+                            this.LIMITEWEIGHT);
+                    j++;
+                }catch(IndexOutOfBoundsException ioe){
+                    break;
+                }
             }
         }
     }
@@ -74,6 +82,7 @@ public class Maps {
             int r_asteristico = -1;
             ArrayList<Integer> edgesW_R = this.edges(w);
             for(Integer r: edgesW_R){
+                r = (int)r;
                 int alphaW_R = this.alpha(w, r);
                 if(gama[r] == 0 && beta[r] > beta[w]+alphaW_R){
                     beta[r] = beta[w] + alphaW_R;
@@ -110,15 +119,20 @@ public class Maps {
         return gama;
     }
     public int alpha(int w, int r){
-        return this.adjacenciesMatrix[w][r];
+        int edge;
+        if(this.adjacenciesMatrix[w][r] != 0)
+            edge =  this.adjacenciesMatrix[w][r];
+        else
+            edge = this.adjacenciesMatrix[r][w];
+        return edge;
     }
     public ArrayList<Integer> edges(int vertice){
         ArrayList<Integer> eadge = new ArrayList<Integer>();
         for(int i=0;i < this.size;i++){
             if (this.adjacenciesMatrix[vertice][i] != 0)
-                eadge.add(this.adjacenciesMatrix[vertice][i]);
+                eadge.add(i);
             if(this.adjacenciesMatrix[i][vertice] != 0)
-                eadge.add(this.adjacenciesMatrix[i][vertice]);
+                eadge.add(i);
         }
         return eadge;
     }
@@ -126,18 +140,12 @@ public class Maps {
         this.adjacenciesMatrix = mat;
     }
     public static void main(String[] args) {
-        int[][] matriz = {{0,1,1,0,0},
-                          {0,0,1,0,1},
-                          {0,0,0,1,1},
-                          {0,0,0,0,1},
-                          {0,0,0,0,0}};
         ArrayList<Integer> ar = new ArrayList<Integer>();
-        Maps mps = new Maps(199);
-        //mps.setAdjacenciesMatriz(matriz);
-        ar = mps.edges(3);
-        for(Integer d: ar){
-            System.err.println(d);
+        Maps mps = new Maps(10);
+        //mps.imprime();
+        int[] pi = mps.dijkstra(0, 4);
+        for(int i: pi){
+            System.err.println(i);
         }
-        mps.imprime();
-        }
+    }
 }
