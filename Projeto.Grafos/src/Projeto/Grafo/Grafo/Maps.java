@@ -11,23 +11,28 @@ import java.util.Random;
  * @author fc.corporation
  */
 public class Maps {
-    static int[][] adjacenciesMatrix = {{0,0,5,9,0},
+    /*static int[][] adjacenciesMatrix = {{0,0,5,9,0},
                                         {0,0,3,0,10},
                                         {0,0,0,9,0},
                                         {0,0,0,0,100},
-                                        {0,0,0,0,0}};
-    private Random weight;
-    private Random coord;
-    private static final int[] LIMITEEDGE = {1,10};
+                                        {0,0,0,0,0}};*/
+    private int[][] adjacenciesMatrix;
+    public int[][] stationBusTaxi;
+    private ArrayList<ArrayList<Integer>> pathBusStation;
+    private final Random WEIGHT;
+    private final Random COORD;
+    private static final int[] LIMITEEDGE = {1,200};
     private static final int LIMITEWEIGHT = 9;
-    private int size;
+    private final int SIZE;
     
     public Maps(int tamanho){
-        //this.adjacenciesMatrix = new int[tamanho][tamanho];
-        this.weight = new Random();
-        this.coord = new Random();
-        this.size = Maps.adjacenciesMatrix.length;
-        //this.setAdjacencieMatrix();
+        this.adjacenciesMatrix = new int[tamanho][tamanho];
+        this.stationBusTaxi = new int[tamanho][tamanho];
+        this.pathBusStation = new ArrayList<ArrayList<Integer>>();
+        this.WEIGHT = new Random();
+        this.COORD = new Random();
+        this.SIZE = adjacenciesMatrix.length;
+        this.setAdjacencieMatrix();
     }
     private void setAdjacencieMatrix(){
         for(int i=0;i < this.adjacenciesMatrix.length;i++){
@@ -41,7 +46,7 @@ public class Maps {
                     continue;
                 }
                 try{
-                    this.adjacenciesMatrix[i][edges[j]] = 1+this.weight.nextInt(
+                    this.adjacenciesMatrix[i][edges[j]] = 1+this.WEIGHT.nextInt(
                             this.LIMITEWEIGHT);
                     j++;
                 }catch(IndexOutOfBoundsException ioe){
@@ -54,9 +59,9 @@ public class Maps {
         final int LIMCONECTION = 2;
         final int QUANTMAXEADGE = 4;
         int[] point = new int[QUANTMAXEADGE];
-        int p = LIMCONECTION+weight.nextInt(LIMCONECTION);
+        int p = LIMCONECTION+WEIGHT.nextInt(LIMCONECTION);
         for(int i=0;i < p ;i++){
-            point[i] = linha+coord.nextInt(this.LIMITEEDGE[1]-linha);
+            point[i] = linha+COORD.nextInt(this.LIMITEEDGE[1]-linha);
         }
         return point;
     }
@@ -69,14 +74,22 @@ public class Maps {
             }
         }
     }
+    public void imprime2(){
+        for(int i=0;i < this.stationBusTaxi.length;i++){
+            for(int j=0; j< this.stationBusTaxi.length;j++){
+                System.out.printf("%d, ", stationBusTaxi[i][j]);
+                if(j+1 == this.stationBusTaxi.length)
+                    System.out.printf("\n");
+            }
+        }
+    }
     public ArrayList<Integer> dijkstra(int u, int v){
-    //public int[] dijkstra(int u, int v){
         ArrayList<Integer> piFiltrade = new ArrayList<Integer>();
         int w = u;
         int infinito = 999999999;
-        int[] gama = new int[this.size];
-        int[] beta = setBeta(this.size);
-        int[] pi = new int[this.size];
+        int[] gama = new int[this.SIZE];
+        int[] beta = setBeta(this.SIZE);
+        int[] pi = new int[this.SIZE];
         gama[u] = 1;
         beta[u] = 0;
         while(w != v){
@@ -133,7 +146,7 @@ public class Maps {
     }
     public ArrayList<Integer> edges(int vertice){
         ArrayList<Integer> eadge = new ArrayList<Integer>();
-        for(int i=0;i < this.size;i++){
+        for(int i=0;i < this.SIZE;i++){
             if (this.adjacenciesMatrix[vertice][i] != 0)
                 eadge.add(i);
             if(this.adjacenciesMatrix[i][vertice] != 0)
@@ -144,14 +157,23 @@ public class Maps {
     public void setAdjacenciesMatriz(int[][] mat){
         this.adjacenciesMatrix = mat;
     }
-    public static void main(String[] args) {
-        ArrayList<Integer> ar = new ArrayList<Integer>();
-        Maps mps = new Maps(10);
-        //mps.imprime();
-        ArrayList<Integer> pi = mps.dijkstra(0, 4);
-        //int[] pi = mps.dijkstra(0, 4);
-        for(int i: pi){
-            System.err.println(i);
+    public void generatorBusTaxiStation(){
+        final int quantStation = 30;
+        final int LIMITESTATION = 5;
+        Random stationGenerator = new Random();
+        int station;
+        int nextStation;
+        for(int i=0;i < quantStation;i++){
+            station = stationGenerator.nextInt(Maps.LIMITEEDGE[1]-LIMITESTATION);
+                nextStation = station + stationGenerator.nextInt(LIMITESTATION);
+            this.stationBusTaxi[station][nextStation] = 1;
+            this.pathBusStation.add(this.dijkstra(station, nextStation));
         }
+    }
+    public static void main(String[] args) {
+        Maps mps = new Maps(200);
+        mps.generatorBusTaxiStation();
+        ArrayList<Integer> pi = mps.dijkstra(0, 2);
+        mps.imprime2();
     }
 }
