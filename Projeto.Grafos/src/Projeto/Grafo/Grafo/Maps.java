@@ -21,7 +21,7 @@ public class Maps {
     private ArrayList<ArrayList<Integer>> pathBusStation;
     private final Random WEIGHT;
     private final Random COORD;
-    private static final int[] LIMITEEDGE = {1,200};
+    private static final int[] LIMITEEDGE = {1,50};
     private static final int LIMITEWEIGHT = 9;
     private final int SIZE;
     
@@ -158,20 +158,42 @@ public class Maps {
         this.adjacenciesMatrix = mat;
     }
     public void generatorBusTaxiStation(){
-        final int quantStation = 30;
+        final int quantStation = 50;
         final int LIMITESTATION = 5;
+        ArrayList<Integer> numGenerated = new ArrayList<Integer>();
         Random stationGenerator = new Random();
-        int station;
+        int station = stationGenerator.nextInt(Maps.LIMITEEDGE[1]-LIMITESTATION);
         int nextStation;
         for(int i=0;i < quantStation;i++){
-            station = stationGenerator.nextInt(Maps.LIMITEEDGE[1]-LIMITESTATION);
-                nextStation = station + stationGenerator.nextInt(LIMITESTATION);
+            numGenerated.add(station);
+            nextStation = station + 1 + stationGenerator.nextInt(LIMITESTATION);
             this.stationBusTaxi[station][nextStation] = 1;
             this.pathBusStation.add(this.dijkstra(station, nextStation));
+            station = nextStation;
+            if(station + LIMITESTATION > Maps.LIMITEEDGE[1]){
+                try{
+                    station = this.adequadeStation(numGenerated, LIMITESTATION);
+                }catch(java.lang.NullPointerException npe){}
+            }
+            
         }
     }
+    public int adequadeStation(ArrayList<Integer> stations, int constant){
+        Integer station = null;
+        for(int i=0;i < stations.size();i++){
+            if(stations.get(i) + constant < Maps.LIMITEEDGE[1]){
+                station = stations.get(i);
+                stations.remove(i);
+                break;
+            }
+        }
+        if(station == null){
+            throw new java.lang.NullPointerException();
+        }
+        return station;
+    }
     public static void main(String[] args) {
-        Maps mps = new Maps(200);
+        Maps mps = new Maps(50);
         mps.generatorBusTaxiStation();
         ArrayList<Integer> pi = mps.dijkstra(0, 2);
         mps.imprime2();
