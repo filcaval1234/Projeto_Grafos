@@ -162,7 +162,8 @@ public class Maps {
         final int LIMITESTATION = 5;
         ArrayList<Integer> numGenerated = new ArrayList<Integer>();
         Random stationGenerator = new Random();
-        int station = stationGenerator.nextInt(Maps.LIMITEEDGE[1]-LIMITESTATION);
+        //int station = stationGenerator.nextInt(Maps.LIMITEEDGE[1]-LIMITESTATION);
+        int station = 0;
         int nextStation;
         for(int i=0;i < quantStation;i++){
             numGenerated.add(station);
@@ -170,7 +171,7 @@ public class Maps {
             this.stationBusTaxi[station][nextStation] = 1;
             this.pathBusStation.add(this.dijkstra(station, nextStation));
             station = nextStation;
-            if(station + LIMITESTATION > Maps.LIMITEEDGE[1]){
+            if(station + LIMITESTATION >= Maps.LIMITEEDGE[1]){
                 try{
                     station = this.adequadeStation(numGenerated, LIMITESTATION);
                 }catch(java.lang.NullPointerException npe){}
