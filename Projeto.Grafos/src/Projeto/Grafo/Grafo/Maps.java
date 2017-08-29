@@ -17,8 +17,10 @@ public class Maps {
                                         {0,0,0,0,100},
                                         {0,0,0,0,0}};*/
     private int[][] adjacenciesMatrix;
-    public int[][] stationBusTaxi;
+    private int[][] stationBusTaxi;
+    private int[][] stationTrainBus;
     private ArrayList<ArrayList<Integer>> pathBusStation;
+    private ArrayList<ArrayList<Integer>> pathTrainstation;
     private final Random WEIGHT;
     private final Random COORD;
     private static final int[] LIMITEEDGE = {1,50};
@@ -28,7 +30,9 @@ public class Maps {
     public Maps(int tamanho){
         this.adjacenciesMatrix = new int[tamanho][tamanho];
         this.stationBusTaxi = new int[tamanho][tamanho];
+        this.stationTrainBus = new int[tamanho][tamanho];
         this.pathBusStation = new ArrayList<ArrayList<Integer>>();
+        this.pathTrainstation = new ArrayList<ArrayList<Integer>>();
         this.WEIGHT = new Random();
         this.COORD = new Random();
         this.SIZE = adjacenciesMatrix.length;
@@ -162,7 +166,6 @@ public class Maps {
         final int LIMITESTATION = 5;
         ArrayList<Integer> numGenerated = new ArrayList<Integer>();
         Random stationGenerator = new Random();
-        //int station = stationGenerator.nextInt(Maps.LIMITEEDGE[1]-LIMITESTATION);
         int station = 0;
         int nextStation;
         for(int i=0;i < quantStation;i++){
@@ -192,6 +195,29 @@ public class Maps {
             throw new java.lang.NullPointerException();
         }
         return station;
+    }
+    public void setStationTrain(){
+        final int quantStation = 30;
+        final int LIMITESTATION = 8;
+        ArrayList<Integer> numGenerated = new ArrayList<Integer>();
+        Random stationGenerator = new Random();
+        int station = 0;
+        int nextStation;
+        for(int i=0;i < quantStation;i++){
+            numGenerated.add(station);
+            nextStation = station + 1 + stationGenerator.nextInt(LIMITESTATION);
+            this.stationTrainBus[station][nextStation] = 1;
+            this.pathTrainstation.add(this.dijkstra(station, nextStation));
+            station = nextStation;
+            if(station + LIMITESTATION >= Maps.LIMITEEDGE[1]){
+                try{
+                    station = this.adequadeStation(numGenerated, LIMITESTATION);
+                }catch(java.lang.NullPointerException npe){}
+            }
+        }
+    }
+    public void interconectsTrainAndBusStation(){
+        
     }
     public static void main(String[] args) {
         Maps mps = new Maps(50);
